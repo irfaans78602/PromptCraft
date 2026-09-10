@@ -4,7 +4,7 @@ Calls Google Gemini API and returns the response.
 
 Setup:
 1. Get a free Gemini API key: https://aistudio.google.com/apikey
-2. Create a .env file next to this script with:
+2. Create a set-gemini-key.env file next to this script with:
        GEMINI_API_KEY=your_key_here
 3. Run:  uvicorn app:app --reload
 4. Open: http://127.0.0.1:8000
@@ -17,11 +17,13 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from google import genai
 
-load_dotenv()
+load_dotenv("set-gemini-key.env")
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
-    raise RuntimeError("Set GEMINI_API_KEY in a .env file before running.")
+    raise RuntimeError("Set GEMINI_API_KEY in a set-gemini-key.env file before running.")
+
+print("GEMINI_API_KEY loaded for this session.")
 
 client = genai.Client(api_key=API_KEY)
 
