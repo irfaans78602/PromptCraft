@@ -1,0 +1,28 @@
+SQL SERVER BEST PRACTICES REFERENCE
+
+Normalization
+- Aim for at least 3NF for OLTP schemas. Denormalize deliberately for reporting/OLAP tables, and document why.
+- Every table should have a primary key. Prefer a surrogate INT/BIGINT IDENTITY key over composite natural keys for join simplicity.
+- Avoid repeating groups (e.g. Phone1, Phone2, Phone3 columns) — move them to a child table.
+
+Indexing
+- Every foreign key column should usually have a non-clustered index; SQL Server does not create these automatically.
+- The clustered index should be on a narrow, static, ever-increasing key (often the surrogate PK) to avoid page splits.
+- Use INCLUDE columns on non-clustered indexes to create covering indexes for hot read queries.
+- Avoid over-indexing tables with heavy write traffic — each index adds INSERT/UPDATE/DELETE overhead.
+
+Data types
+- Use the smallest type that fits the data (TINYINT vs INT, VARCHAR vs NVARCHAR only when Unicode is actually needed).
+- Avoid storing dates as VARCHAR; use DATE, DATETIME2, or DATETIMEOFFSET as appropriate.
+- Avoid NVARCHAR(MAX)/VARCHAR(MAX) unless the column genuinely needs unbounded length — it disables some index optimizations.
+
+Query patterns to flag
+- SELECT * in production code — always list needed columns.
+- Functions wrapped around indexed columns in WHERE clauses (e.g. WHERE YEAR(OrderDate) = 2024) — this prevents index seeks.
+- Implicit conversions between mismatched data types in JOIN or WHERE clauses.
+- Nested views or scalar UDFs in hot query paths — both are common causes of poor execution plans.
+
+Execution plans
+- A "Key Lookup" next to an "Index Seek" usually means a covering index (via INCLUDE) would help.
+- Table Scans on large tables are a red flag — check for a missing or unused index.
+- High "Estimated vs Actual Rows" discrepancy usually means stale statistics — check when stats were last updated.

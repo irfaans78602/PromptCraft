@@ -1,0 +1,25 @@
+ARCHITECTURE DECISION RECORD (ADR) STANDARDS
+
+Standard ADR structure
+1. Title — short, descriptive, present tense (e.g. "Use Azure Service Bus for cross-service messaging")
+2. Status — Proposed / Accepted / Deprecated / Superseded
+3. Context — the problem, constraints, and forces at play. No solution yet, just the situation.
+4. Decision — the chosen approach, stated clearly and in the affirmative ("We will...")
+5. Consequences — both positive and negative outcomes of the decision, including tradeoffs accepted.
+6. Alternatives considered — other options evaluated and why they were rejected.
+
+Writing conventions
+- Use active voice and present/future tense for the Decision section.
+- Avoid vague qualifiers like "should probably" or "might want to" — ADRs record firm decisions, not suggestions.
+- Keep each ADR focused on a single decision; split unrelated decisions into separate documents.
+- Date and author/owner should be included in the header for traceability.
+
+Stakeholder-ready summary conventions
+- Lead with business impact (cost, risk, timeline) before technical detail.
+- Avoid unexplained acronyms; define on first use.
+- Keep to one page where possible; link out to the full technical design for detail.
+
+Technical design document conventions
+- Include: Overview, Goals/Non-Goals, Proposed Architecture (with diagram description), Data Flow, Failure Modes, Rollout Plan, Open Questions.
+- Non-Goals are as important as Goals — explicitly state what is out of scope to prevent scope creep during review.
+- Failure Modes section should cover at least: what happens on partial failure, retry behavior, and data consistency guarantees.

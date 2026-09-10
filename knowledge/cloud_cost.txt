@@ -1,0 +1,22 @@
+CLOUD COST GOVERNANCE REFERENCE (GCP & AZURE)
+
+Common cost drivers to flag
+- Idle or oversized compute (VMs/instances running 24/7 at a size larger than utilization justifies).
+- Orphaned resources: unattached disks/volumes, unused static IPs, old snapshots, and idle load balancers.
+- Data egress costs — often underestimated; cross-region or cross-cloud transfer is frequently the hidden line item.
+- Non-production environments (dev/staging) left running outside business hours.
+- Reserved Instance / Committed Use Discount coverage gaps — on-demand pricing being paid for steady-state workloads that qualify for discounts.
+
+Executive narrative conventions
+- Open with the headline number and trend (e.g. "Total spend increased 18% month-over-month, driven primarily by compute in the EU region").
+- Follow with the top 2-3 cost drivers in plain English, avoiding SKU-level jargon in the summary (save detail for an appendix).
+- Always end with one clear, prioritized recommendation — not a laundry list. Executives want the single highest-leverage action.
+
+Optimization opportunity framing
+- Frame recommendations by estimated savings and effort required (e.g. "Low effort / high savings: rightsizing idle VMs in dev").
+- Distinguish one-time cleanup actions (deleting orphaned resources) from ongoing governance changes (tagging policy, budget alerts, auto-shutdown schedules).
+- Where possible, tie cost anomalies to a specific team, project, or environment using resource tags — untagged spend should be called out explicitly as a governance gap.
+
+Plain English cost trend explanation style
+- Avoid restating raw billing line items; translate "Compute Engine N2 instances" into "general-purpose virtual machines" for a non-technical audience.
+- Explain trend direction and primary cause together, not as separate disconnected facts.

@@ -1,0 +1,21 @@
+TECHNICAL RESUME REPOSITIONING GUIDELINES
+
+Bullet point structure
+- Use the format: Action verb + what was done + measurable result/impact.
+- Lead with strong action verbs relevant to the target role (e.g. "Architected", "Optimized", "Led" for senior roles; "Built", "Implemented", "Automated" for IC roles).
+- Quantify impact wherever the original experience allows it (%, $, time saved, scale) — but never invent numbers not present in the source material.
+
+Repositioning principles
+- Never invent skills, tools, or outcomes not present in the original resume content — repositioning means re-emphasizing and re-wording real experience, not fabricating new experience.
+- Map existing keywords to the target role's likely applicant tracking system (ATS) terms without misrepresenting the work (e.g. "wrote SQL queries" can become "queried and optimized relational databases" but not "designed database architecture" unless that was actually done).
+- When experience doesn't map cleanly to the target role, be honest about the gap rather than stretching the bullet to imply false alignment — instead, suggest which adjacent experience is the closest honest fit.
+
+Professional summary conventions
+- 2-4 sentences, no first person pronouns.
+- Structure: years of experience + domain + 2-3 core strengths + what value they bring to the target role.
+- Avoid generic buzzwords ("results-driven", "team player") without backing evidence in the bullets below it.
+
+Common target-role transitions seen in this niche
+- Data engineer → Solutions architect: emphasize systems thinking, cross-team collaboration, and any design/decision-making experience over raw pipeline-building tasks.
+- SQL/DBA → Data engineer: emphasize automation, pipeline work, and any cloud platform exposure over routine maintenance tasks.
+- IC → Team lead: emphasize any mentoring, code review, or informal leadership moments, even if the title wasn't formally "lead".

@@ -1,0 +1,23 @@
+AZURE DATA FACTORY / SSIS ERROR REFERENCE
+
+Common Azure Data Factory error patterns
+- "ErrorCode=UserErrorFailedToResolveParametersInDynamicContent": usually a mismatched or missing pipeline parameter/expression syntax. Check for unescaped @ symbols or mismatched braces in dynamic content.
+- "ErrorCode=SqlOperationFailed" with a timeout: often caused by a long-running stored procedure or missing index at the sink; consider increasing the Copy Activity timeout or optimizing the target query.
+- "ErrorCode=2200 UserErrorInvalidColumnMappingColumnCountMismatch": the source and sink schemas have a different column count — check for a recently added/removed column that wasn't reflected in the dataset mapping.
+- "Broken pipe" or "connection reset" during large copy activities: usually a network/firewall timeout on a long transfer; consider enabling staged copy or increasing Data Integration Unit (DIU) allocation.
+
+Common SSIS error patterns
+- "The value could not be converted because of a potential loss of data": a data type mismatch between source and destination columns, often VARCHAR-to-numeric or string truncation.
+- "Violation of PRIMARY KEY constraint" during a Data Flow load: duplicate keys in the source extract, usually from an unfiltered incremental load or a broken watermark/change-tracking query.
+- "The package execution failed. The step failed" with no further detail: check the SSISDB execution report (Integration Services Catalogs > reports) for the specific component and row that failed rather than relying on the top-level message.
+
+Root-cause triage checklist
+1. Identify whether the failure is at extract, transform, or load stage.
+2. Check source connectivity and credentials first — many "generic" failures are actually expired service principal secrets or firewall rule changes.
+3. Compare source and destination schema definitions for drift.
+4. Check for NULLs in non-nullable target columns.
+5. Review recent schema or pipeline changes near the failure's first occurrence.
+
+Fix recommendations style
+- Always separate "plain English explanation" from "recommended fix steps" — pipeline errors are often technical and need translation for non-DBA stakeholders.
+- Prefer idempotent fixes (e.g. MERGE instead of INSERT for incremental loads) to prevent recurrence.

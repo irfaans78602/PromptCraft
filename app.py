@@ -8,6 +8,12 @@ Setup:
        GEMINI_API_KEY=your_key_here
 3. Run:  uvicorn app:app --reload
 4. Open: http://127.0.0.1:8000
+
+RAG: each niche in NICHES has a "file" key pointing at a plain-text
+reference file under knowledge/. That file's content is loaded and spliced
+into the prompt as grounding context before the request goes to Gemini.
+Edit those files (or add a new "file" entry for a new niche) to change
+what the model is grounded on — no code changes needed.
 """
 
 import os
@@ -37,6 +43,7 @@ app = FastAPI(title="PromptCraft")
 NICHES = {
     "sql": {
         "label": "SQL Query / Schema Assistant",
+        "file": "knowledge/sql.txt",
         "default_role": "Senior database architect reviewing SQL Server schemas and queries",
         "tasks": [
             "Review this schema for normalization issues",
@@ -54,6 +61,7 @@ NICHES = {
     },
     "etl": {
         "label": "ETL Error Translator",
+        "file": "knowledge/etl.txt",
         "default_role": "Senior data engineer debugging Azure Data Factory / SSIS pipeline errors",
         "tasks": [
             "Explain this error in plain English",
@@ -70,6 +78,7 @@ NICHES = {
     },
     "arch_doc": {
         "label": "Architecture Doc Generator",
+        "file": "knowledge/arch_doc.txt",
         "default_role": "Solutions architect writing a formal architecture decision record",
         "tasks": [
             "Turn these notes into an Architecture Decision Record (ADR)",
@@ -85,6 +94,7 @@ NICHES = {
     },
     "resume": {
         "label": "Resume Repositioning",
+        "file": "knowledge/resume.txt",
         "default_role": "Career coach repositioning a technical resume for a target role",
         "tasks": [
             "Rewrite this bullet point for a new target role",
@@ -100,6 +110,7 @@ NICHES = {
     },
     "cloud_cost": {
         "label": "Cloud Cost Report Narrator",
+        "file": "knowledge/cloud_cost.txt",
         "default_role": "Cloud architect producing an executive cost report",
         "tasks": [
             "Summarize this cost data for executives",
@@ -125,9 +136,50 @@ class PromptRequest(BaseModel):
     format_tone: str
 
 
+# ---------------------------------------------------------------------------
+# RAG: each niche has a "file" key pointing at a plain-text knowledge file.
+# We load it once per niche and cache it in memory (files are small and
+# static, so this avoids re-reading disk on every request).
+# ---------------------------------------------------------------------------
+_knowledge_cache: dict[str, str] = {}
+
+
+def load_knowledge(niche_config: dict) -> str:
+    """Read a niche's knowledge file from disk, caching the result."""
+    file_path = niche_config.get("file")
+    if not file_path:
+        return ""
+
+    if file_path in _knowledge_cache:
+        return _knowledge_cache[file_path]
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = ""
+
+    _knowledge_cache[file_path] = content
+    return content
+
+
 def build_prompt(niche_config: dict, data: PromptRequest) -> str:
-    """Assemble the four inputs plus niche system instructions into one prompt."""
+    """Assemble the four inputs, niche system instructions, and retrieved
+    knowledge into one prompt."""
+    knowledge = load_knowledge(niche_config)
+
+    knowledge_block = ""
+    if knowledge:
+        knowledge_block = f"""
+
+Reference material (use this to inform your answer where relevant; do not
+just repeat it back, and don't mention that it was provided to you):
+---
+{knowledge}
+---"""
+
     return f"""{niche_config['system_instructions']}
+{knowledge_block}
 
 You are acting in the following role: {data.role}
 
