@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptCraft</title>
+<style>
+  :root {
+    --blueprint: #0f2847;
+    --blueprint-line: #1c3a63;
+    --paper: #eef2f6;
+    --ink: #16202c;
+    --amber: #e0932c;
+    --amber-dim: #b3711c;
+    --mono: 'Courier New', Courier, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--blueprint);
+    background-image:
+      linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    color: var(--paper);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 32px 20px 60px;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: #9fb3cc;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .niche-picker {
+    margin-bottom: 20px;
+  }
+
+  .niche-picker label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+
+  select {
+    width: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    border: none;
+    border-radius: 4px;
+    padding: 11px 12px;
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+
+  select:focus {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+
+  form {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--blueprint-line);
+    border-radius: 6px;
+    padding: 24px;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    border: none;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 56px;
+  }
+
+  textarea:focus {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+
+  button {
+    width: 100%;
+    background: var(--amber);
+    color: var(--blueprint);
+    border: none;
+    border-radius: 4px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background 0.15s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: #f0a442;
+  }
+
+  button:disabled {
+    background: var(--amber-dim);
+    cursor: not-allowed;
+  }
+
+  .result-section {
+    margin-top: 24px;
+    display: none;
+  }
+
+  .result-section.visible {
+    display: block;
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .result-header label {
+    margin-bottom: 0;
+  }
+
+  .copy-btn {
+    width: auto;
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    font-family: var(--mono);
+  }
+
+  .copy-btn:hover:not(:disabled) {
+    background: rgba(224, 147, 44, 0.1);
+  }
+
+  #result {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+
+  .error {
+    color: #ff8a8a;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  .error.visible {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">PROMPTCRAFT</div>
+    <h1>Build the prompt, get the result</h1>
+    <p>Pick a niche, fill in the four fields, and PromptCraft assembles a structured prompt for Gemini.</p>
+  </header>
+
+  <div class="niche-picker">
+    <label for="niche">Niche</label>
+    <select id="niche"></select>
+  </div>
+
+  <form id="promptForm">
+    <div class="field">
+      <label for="role">Role</label>
+      <textarea id="role"></textarea>
+    </div>
+    <div class="field">
+      <label for="context">Context</label>
+      <textarea id="context"></textarea>
+    </div>
+    <div class="field">
+      <label for="task">Task</label>
+      <select id="task"></select>
+    </div>
+    <div class="field">
+      <label for="formatTone">Format / Tone</label>
+      <textarea id="formatTone"></textarea>
+    </div>
+    <button type="submit" id="submitBtn">Generate</button>
+    <div class="error" id="errorMsg"></div>
+  </form>
+
+  <div class="result-section" id="resultSection">
+    <div class="result-header">
+      <label>Result</label>
+      <button class="copy-btn" id="copyBtn" type="button">Copy</button>
+    </div>
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+  const nicheSelect = document.getElementById('niche');
+  const roleField = document.getElementById('role');
+  const contextField = document.getElementById('context');
+  const taskSelect = document.getElementById('task');
+  const formatField = document.getElementById('formatTone');
+  const form = document.getElementById('promptForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const resultSection = document.getElementById('resultSection');
+  const resultDiv = document.getElementById('result');
+  const errorMsg = document.getElementById('errorMsg');
+  const copyBtn = document.getElementById('copyBtn');
+
+  let niches = {};
+
+  // Load niche config from the backend and populate the dropdown
+  async function loadNiches() {
+    const res = await fetch('/niches');
+    niches = await res.json();
+
+    nicheSelect.innerHTML = '';
+    for (const [key, config] of Object.entries(niches)) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = config.label;
+      nicheSelect.appendChild(opt);
+    }
+
+    applyNiche(nicheSelect.value);
+  }
+
+  // Update form fields to match the selected niche's defaults
+  function applyNiche(nicheKey) {
+    const config = niches[nicheKey];
+    if (!config) return;
+
+    roleField.value = config.default_role;
+    contextField.placeholder = config.context_placeholder;
+    contextField.value = '';
+    formatField.value = config.default_format;
+
+    taskSelect.innerHTML = '';
+    config.tasks.forEach((task) => {
+      const opt = document.createElement('option');
+      opt.value = task;
+      opt.textContent = task;
+      taskSelect.appendChild(opt);
+    });
+
+    resultSection.classList.remove('visible');
+    errorMsg.classList.remove('visible');
+  }
+
+  nicheSelect.addEventListener('change', () => applyNiche(nicheSelect.value));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.remove('visible');
+
+    const payload = {
+      niche: nicheSelect.value,
+      role: roleField.value,
+      context: contextField.value,
+      task: taskSelect.value,
+      format_tone: formatField.value,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Generating…';
+
+    try {
+      const res = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || 'Something went wrong.');
+      }
+
+      resultDiv.textContent = data.result;
+      resultSection.classList.add('visible');
+    } catch (err) {
+      errorMsg.textContent = err.message;
+      errorMsg.classList.add('visible');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Generate';
+    }
+  });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(resultDiv.textContent).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
+    });
+  });
+
+  loadNiches();
+</script>
+</body>
+</html>
